@@ -19,6 +19,7 @@ local token_map = {
   ["default"]     = "Label",
   ["break"]       = "Keyword",
   ["sizeof"]      = "Keyword",
+  ["throw"]       = "Keyword",
   ["identifier"]  = "Identifier",
   ["keyword"]     = "Keyword",
   ["fstring"]     = "String",
@@ -62,6 +63,14 @@ local token_map = {
   ["$"]           = "Operator",
   ["~"]           = "Operator",
   [":>"]          = "Operator",
+  [":>="]         = "Operator",
+  ["|>="]         = "Operator",
+  ["|>>="]        = "Operator",
+  ["<<="]         = "Operator",
+  ["<<<="]        = "Operator",
+  ["$="]          = "Operator",
+  ["|="]          = "Operator",
+  ["&="]          = "Operator",
   ["|"]           = "Operator",
   ["("]           = "Delimiter",
   [")"]           = "Delimiter",
@@ -90,24 +99,41 @@ local function run_lexer_highlight()
       end
     end
   end
-  local tmp_file = vim.fn.tempname()
+  local source_path = vim.api.nvim_buf_get_name(bufnr)
+  local source_dir = vim.fs.dirname(source_path)
+  local extension = vim.fn.fnamemodify(source_path, ":e")
+  local tmp_file = source_dir
+      .. "/."
+      .. vim.fn.fnamemodify(vim.fn.tempname(), ":t")
+      .. "."
+      .. extension
   local f = io.open(tmp_file, "w")
   if not f then return end
   f:write(table.concat(lines, "\n"))
   f:close()
-  local cmd = { "qc", "-dump-tokens", tmp_file }
   local stdout_data = {}
+  local cmd = { "qc", tmp_file, "-dump-tokens" }
   vim.fn.jobstart(cmd, {
-    cwd = vim.fn.getcwd(),
-    stdout_buffered = true,
-    on_stdout = function(_, data)
-      if data then
-        for _, line in ipairs(data) do
-          table.insert(stdout_data, line)
+      cwd = source_dir,
+      stdout_buffered = true,
+      stderr_buffered = true,
+      on_stderr = function(_, data)
+        for _, line in ipairs(data or {}) do
+          if line ~= "" then
+            vim.schedule(function()
+              vim.notify(line, vim.log.levels.ERROR)
+            end)
+          end
         end
-      end
-    end,
-    on_exit = function()
+      end,
+      on_stdout = function(_, data)
+        for _, line in ipairs(data or {}) do
+          if line ~= "" then
+            table.insert(stdout_data, line)
+          end
+        end
+      end,
+      on_exit = function()
       os.remove(tmp_file)
       vim.api.nvim_buf_clear_namespace(bufnr, ns_id, 0, -1)
       vim.diagnostic.reset(diag_ns_id, bufnr)
