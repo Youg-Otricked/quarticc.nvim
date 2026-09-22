@@ -1,6 +1,6 @@
-# quantumc.nvim
+# quarticc.nvim
 
-A lightweight, high-performance syntax highlighting and diagnostics extension for the QuantumC (`qc`) language in Neovim. 
+A lightweight, high-performance syntax highlighting and diagnostics extension for the QuarticC (`qc`) language in Neovim. 
 
 Instead of relying on heavy Tree-sitter configurations or complex LSP setups, this plugin hooks directly into your native compiled C++ `qc` compiler binary to paint editor colors and generate error diagnostics instantly as you type.
 
@@ -9,7 +9,7 @@ Requires QC Version `x0.20.11`+
 
 ## How It Works
 
-1. Whenever you open or type in a QuantumC file, the plugin creates a temporary snapshot file of your buffer in RAM.
+1. Whenever you open or type in a QuarticC file, the plugin creates a temporary snapshot file of your buffer in RAM.
 2. It executes your local `qc` binary with the `-dump-tokens` flag against that file.
 3. It parses the line, column, and token type strings, applying native Neovim color mappings (`Keyword`, `Type`, `Operator`, `Delimiter`, etc.).
 4. If an error string (like `QC-IC03`) is returned, it instantly routes it to Neovim's diagnostic subsystem to display error hovers.
@@ -32,8 +32,8 @@ Add the repository block to your Neovim plugins file:
 
 ```lua
 use {
-  'Youg-Otricked/quantumc.nvim',
-  ft = { 'quantumc' },
+  'Youg-Otricked/quarticc.nvim',
+  ft = { 'quarticc' },
 }
 ```
 Then:
@@ -47,8 +47,8 @@ Then:
 ```lua
 return {
   {
-    "Youg-Otricked/quantumc.nvim",
-    ft = { "quantumc" },
+    "Youg-Otricked/quarticc.nvim",
+    ft = { "quarticc" },
   }
 }
 ```

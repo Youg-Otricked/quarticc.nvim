@@ -1,5 +1,5 @@
-local ns_id = vim.api.nvim_create_namespace("quantumc_syntax")
-local diag_ns_id = vim.api.nvim_create_namespace("quantumc_diagnostics")
+local ns_id = vim.api.nvim_create_namespace("quarticc_syntax")
+local diag_ns_id = vim.api.nvim_create_namespace("quarticc_diagnostics")
 local token_map = {
   ["int"]         = "Type",
   ["string"]      = "Type",
